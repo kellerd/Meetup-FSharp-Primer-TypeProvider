@@ -1,0 +1,25 @@
+type project
+title
+    TicTacToeProvider
+owners
+    Dan Keller
+authors 
+    Dan Keller
+projectUrl
+    http://github.com/kellerd/TicTacToeProvider
+iconUrl
+    https://raw.githubusercontent.com/kellerd/TicTacToeProvider/master/docs/files/img/logo.png
+licenseUrl
+    http://github.com/kellerd/TicTacToeProvider/blob/master/LICENSE.txt
+requireLicenseAcceptance
+    false
+copyright
+    Copyright 2015
+tags
+    TicTacToe Example TypeProvider FSharp Game IDE
+summary
+    Type provider for TicTacToe
+description
+    Example type provider in F# for playing a game of TicTacToe in an IDE.
+
+

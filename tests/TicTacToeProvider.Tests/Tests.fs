@@ -1,6 +1,6 @@
-﻿module FSharp.ProjectScaffold.Tests
+module TicTacToeProvider.Tests
 
-open FSharp.ProjectTemplate
+open TicTacToeProvider
 open NUnit.Framework
 
 [<Test>]
