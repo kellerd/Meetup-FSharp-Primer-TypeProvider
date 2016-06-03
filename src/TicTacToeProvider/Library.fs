@@ -14,3 +14,7 @@ module Library =
   /// ## Parameters
   ///  - `num` - whatever
   let hello num = 42
+  let inline factorial n = 
+      match n with
+      | n when n < LanguagePrimitives.GenericZero -> invalidArg "n" "n must be > or = to 0"
+      | n -> Seq.reduce (*) [ LanguagePrimitives.GenericOne .. n ]
