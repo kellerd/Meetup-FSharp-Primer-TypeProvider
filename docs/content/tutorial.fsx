@@ -10,7 +10,7 @@ Introducing your project
 Say more
 
 *)
-#r "TicTacToeProvider.dll"
+#r "TicTacToeProvider/TicTacToeProvider.dll"
 open TicTacToeProvider
 
 Library.hello 0

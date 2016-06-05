@@ -26,20 +26,31 @@ Example
 This example demonstrates using a function defined in this sample library.
 
 *)
-#r "TicTacToeProvider.dll"
+#r "TicTacToeProvider/TicTacToeProvider.dll"
 open TicTacToeProvider
 
-printfn "hello = %i" <| Library.hello 0
+(*** define-output:test ***)
+Library.hello 10
+|> printfn "hello = %i" 
+
+(** The result of the previous snippet is: *)
+(*** include-output:test ***)
+
+let result = Library.tryFactorial 5 |> Option.get 
+
+(** And the variable `result` has the following value: *)
+(*** include-value: result ***)
 
 (**
 Some more info
 
-Samples & documentation
+#Samples & documentation
+ * Samples & documentation
 -----------------------
 
 The library comes with comprehensible documentation. 
 It can include tutorials automatically generated from `*.fsx` files in [the content folder][content]. 
-The API reference is automatically generated from Markdown comments in the library implementation.
+The ***API*** reference is automatically generated from Markdown comments in the library implementation.
 
  * [Tutorial](tutorial.html) contains a further explanation of this sample library.
 

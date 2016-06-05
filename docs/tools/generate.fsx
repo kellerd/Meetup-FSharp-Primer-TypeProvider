@@ -109,12 +109,14 @@ let buildReference () =
 let buildDocumentation () =
 
   // First, process files which are placed in the content root directory.
+  let fsiEvaluator = FsiEvaluator() :> IFsiEvaluator
 
   Literate.ProcessDirectory
     ( content, docTemplate, output, replacements = ("root", root)::info,
       layoutRoots = layoutRootsAll.["en"],
       generateAnchors = true,
-      processRecursive = false)
+      processRecursive = false, 
+      fsiEvaluator = fsiEvaluator)
 
   // And then process files which are placed in the sub directories
   // (some sub directories might be for specific language).
@@ -129,11 +131,13 @@ let buildDocumentation () =
         match key with
         | Some lang -> layoutRootsAll.[lang]
         | None -> layoutRootsAll.["en"] // "en" is the default language
+    
 
     Literate.ProcessDirectory
       ( dir, docTemplate, output @@ dirname, replacements = ("root", root)::info,
         layoutRoots = layoutRoots,
-        generateAnchors = true )
+        generateAnchors = true,
+        fsiEvaluator = fsiEvaluator )
 
 // Generate
 copyFiles()

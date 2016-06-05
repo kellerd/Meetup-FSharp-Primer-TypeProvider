@@ -22,7 +22,7 @@ let ``Factorial of 5 returns 120`` () =
 [<Test>]
 let ``Factorial of -1 is none`` () = 
   Library.tryFactorial -1 |> should equal None
- 
+
 
 // // Use LanguagePrimitives.GenericZero and LanguagePrimitives.GenericOne in tryFactorial to enable any type that has a Zero, One
 
