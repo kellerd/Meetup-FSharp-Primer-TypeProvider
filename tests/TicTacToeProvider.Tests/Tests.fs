@@ -23,4 +23,4 @@ let ``Factorial of bigint 120 returns 6.689502913 E+198`` () =
 let wrap f x = fun () -> f x |> ignore
 [<Test>]
 let ``Factorial of -1 throws exception`` () = 
-  wrap (Library.factorial) 1 |> should (throwWithMessage "n must be > or = to 0\r\nParameter name: n") typeof<System.ArgumentException>
+  wrap (Library.factorial) -1 |> should (throwWithMessage "n must be > or = to 0\r\nParameter name: n") typeof<System.ArgumentException>
