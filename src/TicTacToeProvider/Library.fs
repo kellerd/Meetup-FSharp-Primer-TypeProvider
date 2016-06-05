@@ -14,7 +14,9 @@ module Library =
   /// ## Parameters
   ///  - `num` - whatever
   let hello num = 42
-  let inline factorial n = 
-      match n with
-      | n when n < LanguagePrimitives.GenericZero -> invalidArg "n" "n must be > or = to 0"
-      | n -> Seq.reduce (*) [ LanguagePrimitives.GenericOne .. n ]
+  let inline tryFactorial n = 
+    match n with
+      | n when n < LanguagePrimitives.GenericZero -> None
+      | n when n = LanguagePrimitives.GenericZero -> Some LanguagePrimitives.GenericOne
+      | n -> [ LanguagePrimitives.GenericOne .. n ] |> Seq.reduce (*) |> Some
+  let facTimes5 = tryFactorial 0 |> Option.map ((*) 5) |> Option.iter (printfn "%A") 
