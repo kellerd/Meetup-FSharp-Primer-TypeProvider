@@ -21,13 +21,26 @@ NUGET
       Microsoft.Bcl (>= 1.1.10)
       Microsoft.Bcl.Build (>= 1.0.14)
     Octokit (0.19)
-      Microsoft.Net.Http
+      Microsoft.Net.Http  - framework: net10, net11, net20, net30, net35, net40, net40-full
     SourceLink.Fake (1.1)
 GITHUB
   remote: fsharp/FAKE
   specs:
     modules/Octokit/Octokit.fsx (60acb2f035cb39f2bd40a6c58a4de10d915da248)
       Octokit
+GIST
+  remote: swlaschin/3418b549bd222396da82
+  specs:
+    FULLPROJECT (bdb911097399d61a6ac28580e34c3968c3dc9e04)
+GITHUB
+  remote: fsprojects/FSharp.TypeProviders.StarterPack
+  specs:
+    src/AssemblyReader.fs (fa494d6308c8b22c8a7c7c6a6cd0e771ddf7c701)
+    src/AssemblyReaderReflection.fs (fa494d6308c8b22c8a7c7c6a6cd0e771ddf7c701)
+    src/ProvidedTypes.fs (fa494d6308c8b22c8a7c7c6a6cd0e771ddf7c701)
+    src/ProvidedTypes.fsi (fa494d6308c8b22c8a7c7c6a6cd0e771ddf7c701)
+    src/ProvidedTypesContext.fs (fa494d6308c8b22c8a7c7c6a6cd0e771ddf7c701)
+    src/ProvidedTypesTesting.fs (fa494d6308c8b22c8a7c7c6a6cd0e771ddf7c701)
 GROUP Test
 NUGET
   remote: https://www.nuget.org/api/v2
