@@ -6,7 +6,7 @@ open ProviderImplementation.ProvidedTypes
 open ``Enterprise-tic-tac-toe``.TicTacToeDomain
 open ``Enterprise-tic-tac-toe``.TicTacToeImplementation
 
-type UserAction<'a> = ContinuePlay of 'a | End
+type UserAction<'a> = Play of 'a
 
 [<TypeProvider()>]
 type TicTacToeTypeProvider() as this =
@@ -16,38 +16,89 @@ type TicTacToeTypeProvider() as this =
   let asm = System.Reflection.Assembly.GetExecutingAssembly()
   let ns = "TicTacToeGame"
 
-  let rec gameLoop (api, userAction) =
-    
-    let t = ProvidedTypeDefinition(userAction, Some(typeof<obj>))
+  let displayCells cells = 
+    let cellToStr cell = 
+        match cell.state with
+        | Empty -> "-"            
+        | Played player ->
+            match player with
+            | PlayerO -> "O"
+            | PlayerX -> "X"
+
+    let printCells cells  = 
+        cells
+        |> List.map cellToStr
+        |> List.reduce (fun s1 s2 -> s1 + "|" + s2) 
+
+    let topCells = 
+        cells |> List.filter (fun cell -> snd cell.pos = Top) 
+    let centerCells = 
+        cells |> List.filter (fun cell -> snd cell.pos = VCenter) 
+    let bottomCells = 
+        cells |> List.filter (fun cell -> snd cell.pos = Bottom) 
+
+    seq {
+        yield printCells topCells
+        yield printCells centerCells 
+        yield printCells bottomCells 
+    }    
+
+  let rec gameLoop moveName api userAction =
+
+    let addUserActions (t:ProvidedTypeDefinition) player makeMove state moves= 
+        moves 
+        |> List.map(fun move -> sprintf "%A - %A" player move, Play (makeMove state move))
+        |> List.iter(fun (newMoveName, play) -> t.AddMemberDelayed (fun() -> gameLoop newMoveName api play))
+
+
+    let t = ProvidedTypeDefinition(moveName, Some(typeof<obj>))
     t.IsErased <- true
-    // let (ContinuePlay moves) =  userAction
-    // for move in moves |> snd  do
-    //     t.AddMemberDelayed (fun() -> gameLoop move)
+    match userAction with 
+    | Play (state,moveResult) -> 
+            let displayInfo = state 
+                                |> api.getCells 
+                                |> displayCells 
 
-    // t.HideObjectMethods <- true
+            let ctor = ProvidedConstructor([])
+            ctor.InvokeCode <- fun args ->
+              <@@
+                displayInfo
+              @@>
+            t.AddMember ctor
 
-    // let displayInfo = game.ToString()
+            let makeMethod name inv docs = 
+                let m = ProvidedMethod(name,[],inv.GetType())
+                m.IsStaticMethod <- true
+                m.InvokeCode <- fun _ -> <@@ inv @@>
+                docs |> Option.iter (fun d -> m.AddXmlDoc(d))
+                m    
 
-    // let docLines = seq {
-    //     yield "<summary>"
-    //     for line in displayInfo.Split('\n') do
-    //         yield sprintf "<para>%s</para>" line
-    //     yield "</summary>"
-    // }
+            t.AddXmlDoc(System.String.Join("\n", displayInfo))
+            match moveResult with
+            | GameTied -> 
+                let tied = ProvidedTypeDefinition("GameTied", Some(typeof<obj>))
+                tied.AddXmlDoc(System.String.Join("\n", displayInfo))
+                tied.AddMember ctor
+                tied.IsErased <- true
+                t.AddMember(tied)
+            | GameWon player -> 
+                let won = ProvidedTypeDefinition("GameWon", Some(typeof<obj>))
+                won.AddXmlDoc(System.String.Join("\n", displayInfo))
+                won.AddMember ctor
+                won.IsErased <- true
+                t.AddMember(won)
+            | PlayerOToMove availableMoves ->
+                addUserActions t PlayerO api.playerOMoves  state availableMoves 
+            | PlayerXToMove availableMoves ->
+                addUserActions t PlayerX api.playerXMoves  state availableMoves 
 
-    // t.AddXmlDoc(System.String.Join("\n", docLines))
-    
-    // let ctor = ProvidedConstructor([])
-    // ctor.InvokeCode <- fun args ->
-    //   <@@
-    //     displayInfo
-    //   @@>
-    // t.AddMember ctor
+
+    t.HideObjectMethods <- true
 
     t
 
   let rootType = ProvidedTypeDefinition(asm, ns, "Game", Some (typeof<obj>), HideObjectMethods = true)
-  do rootType.AddMember (gameLoop (api, ContinuePlay api.newGame))
+  do rootType.AddMember (gameLoop "Begin" api (Play api.newGame))
   do this.AddNamespace(ns, [rootType])
   
 [<assembly:TypeProviderAssembly>] 
