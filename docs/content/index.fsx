@@ -1,10 +1,10 @@
-﻿(*** hide ***)
+(*** hide ***)
 // This block of code is omitted in the generated HTML documentation. Use 
 // it to define helpers that you do not want to show in the documentation.
 #I "../../bin"
 
 (**
-FSharp.ProjectScaffold
+TicTacToeProvider
 ======================
 
 Documentation
@@ -13,8 +13,8 @@ Documentation
   <div class="span1"></div>
   <div class="span6">
     <div class="well well-small" id="nuget">
-      The FSharp.ProjectScaffold library can be <a href="https://nuget.org/packages/FSharp.ProjectScaffold">installed from NuGet</a>:
-      <pre>PM> Install-Package FSharp.ProjectScaffold</pre>
+      The TicTacToeProvider library can be <a href="https://nuget.org/packages/TicTacToeProvider">installed from NuGet</a>:
+      <pre>PM> Install-Package TicTacToeProvider</pre>
     </div>
   </div>
   <div class="span1"></div>
@@ -26,20 +26,31 @@ Example
 This example demonstrates using a function defined in this sample library.
 
 *)
-#r "FSharp.ProjectScaffold.dll"
-open FSharp.ProjectScaffold
+#r "TicTacToeProvider/TicTacToeProvider.dll"
+open TicTacToeProvider
 
-printfn "hello = %i" <| Library.hello 0
+(*** define-output:test ***)
+Library.hello 10
+|> printfn "hello = %i" 
+
+(** The result of the previous snippet is: *)
+(*** include-output:test ***)
+
+let result = Library.tryFactorial 5 |> Option.get 
+
+(** And the variable `result` has the following value: *)
+(*** include-value: result ***)
 
 (**
 Some more info
 
-Samples & documentation
+#Samples & documentation
+ * Samples & documentation
 -----------------------
 
 The library comes with comprehensible documentation. 
 It can include tutorials automatically generated from `*.fsx` files in [the content folder][content]. 
-The API reference is automatically generated from Markdown comments in the library implementation.
+The ***API*** reference is automatically generated from Markdown comments in the library implementation.
 
  * [Tutorial](tutorial.html) contains a further explanation of this sample library.
 
@@ -59,9 +70,9 @@ The library is available under Public Domain license, which allows modification 
 redistribution for both commercial and non-commercial purposes. For more information see the 
 [License file][license] in the GitHub repository. 
 
-  [content]: https://github.com/fsprojects/FSharp.ProjectScaffold/tree/master/docs/content
-  [gh]: https://github.com/fsprojects/FSharp.ProjectScaffold
-  [issues]: https://github.com/fsprojects/FSharp.ProjectScaffold/issues
-  [readme]: https://github.com/fsprojects/FSharp.ProjectScaffold/blob/master/README.md
-  [license]: https://github.com/fsprojects/FSharp.ProjectScaffold/blob/master/LICENSE.txt
+  [content]: https://github.com/fsprojects/TicTacToeProvider/tree/master/docs/content
+  [gh]: https://github.com/fsprojects/TicTacToeProvider
+  [issues]: https://github.com/fsprojects/TicTacToeProvider/issues
+  [readme]: https://github.com/fsprojects/TicTacToeProvider/blob/master/README.md
+  [license]: https://github.com/fsprojects/TicTacToeProvider/blob/master/LICENSE.txt
 *)
