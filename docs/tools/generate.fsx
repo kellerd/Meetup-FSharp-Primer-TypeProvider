@@ -11,17 +11,17 @@
 // (This is the original behaviour of ProjectScaffold prior to multi project support)
 let referenceBinaries = []
 // Web site location for the generated documentation
-let website = "/##ProjectName##"
+let website = "/TicTacToeProvider"
 
-let githubLink = "http://github.com/##GitHome##/##GitName##"
+let githubLink = "http://github.com/kellerd/Meetup-FSharp-Primer-TypeProvider"
 
 // Specify more information about your project
 let info =
-  [ "project-name", "##ProjectName##"
-    "project-author", "##Author##"
-    "project-summary", "##Summary##"
+  [ "project-name", "TicTacToeProvider"
+    "project-author", "Dan Keller"
+    "project-summary", "Type provider for TicTacToe"
     "project-github", githubLink
-    "project-nuget", "http://nuget.org/packages/##ProjectName##" ]
+    "project-nuget", "http://nuget.org/packages/TicTacToeProvider" ]
 
 // --------------------------------------------------------------------------------------
 // For typical project, no changes are needed below
@@ -109,12 +109,14 @@ let buildReference () =
 let buildDocumentation () =
 
   // First, process files which are placed in the content root directory.
+  let fsiEvaluator = FsiEvaluator() :> IFsiEvaluator
 
   Literate.ProcessDirectory
     ( content, docTemplate, output, replacements = ("root", root)::info,
       layoutRoots = layoutRootsAll.["en"],
       generateAnchors = true,
-      processRecursive = false)
+      processRecursive = false, 
+      fsiEvaluator = fsiEvaluator)
 
   // And then process files which are placed in the sub directories
   // (some sub directories might be for specific language).
@@ -129,11 +131,13 @@ let buildDocumentation () =
         match key with
         | Some lang -> layoutRootsAll.[lang]
         | None -> layoutRootsAll.["en"] // "en" is the default language
+    
 
     Literate.ProcessDirectory
       ( dir, docTemplate, output @@ dirname, replacements = ("root", root)::info,
         layoutRoots = layoutRoots,
-        generateAnchors = true )
+        generateAnchors = true,
+        fsiEvaluator = fsiEvaluator )
 
 // Generate
 copyFiles()
