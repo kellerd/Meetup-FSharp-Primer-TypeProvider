@@ -6,7 +6,7 @@ open ProviderImplementation.ProvidedTypes
 open ``Enterprise-tic-tac-toe``.TicTacToeDomain
 open ``Enterprise-tic-tac-toe``.TicTacToeImplementation
 
-type UserAction<'a> = Play of 'a
+type UserAction<'a,'b> = Play of 'a | End of 'b
 
 [<TypeProvider()>]
 type TicTacToeTypeProvider() as this =
@@ -43,62 +43,42 @@ type TicTacToeTypeProvider() as this =
         yield printCells bottomCells 
     }    
 
-  let rec gameLoop moveName api userAction =
-
-    let addUserActions (t:ProvidedTypeDefinition) player makeMove state moves= 
-        moves 
-        |> List.map(fun move -> sprintf "%A - %A" player move, Play (makeMove state move))
-        |> List.iter(fun (newMoveName, play) -> t.AddMemberDelayed (fun() -> gameLoop newMoveName api play))
-
-
+  let rec gameLoop api userAction moveName =
     let t = ProvidedTypeDefinition(moveName, Some(typeof<obj>))
-    t.IsErased <- true
-    match userAction with 
-    | Play (state,moveResult) -> 
-            let displayInfo = state 
-                                |> api.getCells 
-                                |> displayCells 
-
-            let ctor = ProvidedConstructor([])
-            ctor.InvokeCode <- fun args ->
-              <@@
-                displayInfo
-              @@>
-            t.AddMember ctor
-
-            let makeMethod name inv docs = 
-                let m = ProvidedMethod(name,[],inv.GetType())
-                m.IsStaticMethod <- true
-                m.InvokeCode <- fun _ -> <@@ inv @@>
-                docs |> Option.iter (fun d -> m.AddXmlDoc(d))
-                m    
-
-            t.AddXmlDoc(System.String.Join("\n", displayInfo))
-            match moveResult with
-            | GameTied -> 
-                let tied = ProvidedTypeDefinition("GameTied", Some(typeof<obj>))
-                tied.AddXmlDoc(System.String.Join("\n", displayInfo))
-                tied.AddMember ctor
-                tied.IsErased <- true
-                t.AddMember(tied)
-            | GameWon player -> 
-                let won = ProvidedTypeDefinition("GameWon", Some(typeof<obj>))
-                won.AddXmlDoc(System.String.Join("\n", displayInfo))
-                won.AddMember ctor
-                won.IsErased <- true
-                t.AddMember(won)
-            | PlayerOToMove availableMoves ->
-                addUserActions t PlayerO api.playerOMoves  state availableMoves 
-            | PlayerXToMove availableMoves ->
-                addUserActions t PlayerX api.playerXMoves  state availableMoves 
-
-
     t.HideObjectMethods <- true
+    t.IsErased <- true
+
+    let initType state = 
+        let displayInfo = System.String.Join("\n", state |> api.getCells |> displayCells)
+        let ctor = ProvidedConstructor([])
+        ctor.InvokeCode <- fun _ -> <@@ displayInfo @@>
+        t.AddMember ctor
+        t.AddXmlDoc(displayInfo)
+
+    let addUserActions makeMove state moves = 
+        moves 
+        |> List.map(fun move -> sprintf "%A" move, Play (makeMove state move))
+        |> List.iter(fun (newMoveName, play) -> t.AddMemberDelayed (fun() -> gameLoop api play newMoveName))
+
+    match userAction with 
+    | End (state) ->
+        initType state
+    | Play (state,moveResult) -> 
+        initType state
+        match moveResult with
+        | GameTied -> 
+            t.AddMemberDelayed (fun() -> "Game Tied" |> gameLoop api (End state)  )
+        | GameWon player -> 
+            t.AddMemberDelayed (fun() -> sprintf "Game Won by %A" player |> gameLoop api (End state))
+        | PlayerOToMove availableMoves ->
+            addUserActions api.playerOMoves  state availableMoves 
+        | PlayerXToMove availableMoves ->
+            addUserActions api.playerXMoves  state availableMoves 
 
     t
 
   let rootType = ProvidedTypeDefinition(asm, ns, "Game", Some (typeof<obj>), HideObjectMethods = true)
-  do rootType.AddMember (gameLoop "Begin" api (Play api.newGame))
+  do rootType.AddMember (gameLoop api (Play api.newGame) "Begin")
   do this.AddNamespace(ns, [rootType])
   
 [<assembly:TypeProviderAssembly>] 
